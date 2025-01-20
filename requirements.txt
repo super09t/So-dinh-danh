@@ -2,3 +2,6 @@ packaging
 numpy
 seleniumbase
 ujson
+Image
+pytesseract
+datetime
