@@ -1,0 +1,25 @@
+name: Run Python Script Monthly
+
+on:
+  schedule:
+    - cron: '0 0 1 * *'  # Chạy vào lúc nửa đêm ngày 1 hàng tháng
+
+jobs:
+  run-script:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v2
+
+      - name: Set up Python
+        uses: actions/setup-python@v2
+        with:
+          python-version: '3.8.10'  # Chọn phiên bản Python
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt  # Nếu có file requirements.txt
+
+      - name: Run script
+        run: |
+          python Sodinhdanh.py  # Thay thế bằng tên file script của bạn
