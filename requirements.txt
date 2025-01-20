@@ -1,0 +1,4 @@
+packaging
+numpy
+ggsheet
+seleniumbase
