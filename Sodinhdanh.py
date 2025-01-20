@@ -5,16 +5,19 @@ import packaging.version
 import packaging.specifiers
 import packaging.requirements
 from numpy import var
-
+import pytesseract  
 from asyncio import sleep, wait, wait_for
 import time
 #import cv2
 #from tqdm import tqdm
 #import matplotlib.pyplot as plt
 from ggsheet import MicroGoogleSheet
-
+import requests 
+from io import BytesIO
+from PIL import Image 
 #import pytesseract
 import numpy as np
+from selenium.webdriver.common.by import By
 #from websb_manager.chrome import ChromesbManager
 import datetime
 #import execjs
@@ -40,7 +43,7 @@ Cap_DIR = r'./Captcha'
 #THAY DOI THONG TIN ÐANG NH?P
 username = "2500267686"
 password = "2500267686"
-soluong = 50
+soluong = 5
 S = lambda X: sb.execute_script('return document.body.parentNode.scroll'+X)
 #Sumdonghang = int(input()) - 1
 
@@ -51,6 +54,7 @@ S = lambda X: sb.execute_script('return document.body.parentNode.scroll'+X)
 #options.add_argument("--start-maximized")
 #options.add_argument('--blink-settings=imagesEnabled=false')  # Tắt hiển thị hình ảnh
 #sb = websb.Chrome(options=options)
+pytesseract.pytesseract.tesseract_cmd = r'D:\tesseract\tesseract.exe'  # Thay đổi đường dẫn nếu cần
 with SB() as sb:
     sb.get("https://pus.customs.gov.vn/faces/Login")
     # find username/email field and send the username itself to the input field
@@ -86,12 +90,30 @@ with SB() as sb:
     #cv2.imwrite(filename)
     # Load ảnh và apply nhận dạng bằng Tesseract OCR
     #custom_config = r'--oem 3 --psm 6'
-    maxacthuc = input("Nhap capcha: ")
+    #maxacthuc = input("Nhap capcha: ")
+    time.sleep(2)
+    image_element = sb.find_element(By.CSS_SELECTOR, 'img#pt1\\:i5')
+    image_url = sb.get_attribute('img#pt1\:i5', 'src')  
+    image_element.screenshot('screenshot.png')
+
+# Mở hình ảnh từ file đã chụp
+    img = Image.open('screenshot.png')
+    img.save('screenshot.png')
+    time.sleep(3)
+    # Sử dụng pytesseract để trích xuất văn bản
+    text1 = pytesseract.image_to_string(img)
+# Tải hình ảnh từ URL  
+    response = requests.get(image_url)  
+    print(f"text1:{text1}")
+    #sb.open(image_url)
+    
     #maxacthuc = pytesseract.image_to_string(Image.open("./captcha/new_image.jpg"),lang='eng')
     #maxacthuc = pytesseract.image_to_string(image, lang='eng')
     #maxacthuc = maxacthuc.split(" ")
     #cv2.imshow("Image", image)
     #cv2.imshow("Output", gray)
+    
+    maxacthuc = text1
     #cv2.waitKey(0)
     # Xóa ảnh tạm sau khi nhận dạng
     #os.remove(filename)
@@ -166,7 +188,7 @@ with SB() as sb:
         sb.execute_script("arguments[0].click();", dong)
     for row_index, row_data in enumerate(data, start=1):
                     
-                    ggsheet.updateRow(lastrowX+1,[row_data[1],row_data[2],row_data[3],row_data[4]])
+                    ggsheet.updateRow(lastrowX+1,[row_data[0],row_data[1],row_data[2],row_data[3]])
                     lastrowX=lastrowX+1
 
 # Đóng trình duyệt
